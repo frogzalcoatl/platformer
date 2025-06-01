@@ -1,0 +1,19 @@
+# Build files
+*.exe
+*.obj
+*.ilk
+*.log
+*.pdb
+*.idb
+*.lastbuildstate
+*.tlog
+
+# User-specific Visual Studio files
+*.vcxproj.user
+
+# Build directories
+x64/
+platformer/x64/
+
+# Visual Studio cache
+.vs/
