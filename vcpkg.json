@@ -1,0 +1,11 @@
+{
+    "name": "platformer",
+    "version-string": "dev",
+    "dependencies": [
+        {
+            "name": "raylib",
+            "features": ["use-audio"]
+        },
+        "raygui"
+    ]
+}
