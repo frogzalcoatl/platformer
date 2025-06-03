@@ -17,3 +17,6 @@ platformer/x64/
 
 # Visual Studio cache
 .vs/
+
+# vcpkg
+vcpkg_installed

@@ -37,6 +37,9 @@ void Entity::applyGravity(Vector2 gravityCenter, float pullFactor) {
     velocity.y += (distanceY / distance) * pullFactor;
 }
 void Entity::tick() {
+    if (isStatic) return;
+    applyGravity({ position.x, GameConfig::SOURCE_HEIGHT }, GameConfig::GRAVITY_STRENGTH);
+    collision(*this);
     velocity.x *= 0.99f;
     velocity.y *= 0.99f;
     velocity.x = std::clamp(velocity.x, -7.5f, 7.5f);
@@ -47,8 +50,25 @@ void Entity::tick() {
 }
 void Entity::draw() {
     DrawRectangle((int)aabb.min.x, (int)aabb.min.y, (int)width, (int)height, color);
-    //DrawRectangleLines(aabb.min.x + offsetX, aabb.min.y + offsetY, aabb.max.x - aabb.min.x, aabb.max.y - aabb.min.y, RED);
+    //DrawRectangleLines((int)aabb.min.x, (int)aabb.min.y, (int)(aabb.max.x - aabb.min.x), (int)(aabb.max.y - aabb.min.y), RED);
 }
+static const int GROUND_OBSTACLE_WIDTH = 50;
 void newGroundObstacle(float x, float height, Color color) {
-    platforms.push_back(Entity(x, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT - height / 2, 50, height, color));
+    platforms.push_back(Entity(x, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT - height / 2, (float)GROUND_OBSTACLE_WIDTH, height, color));
+}
+void spawnTestEntities() {
+    platforms.push_back(Entity(0, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT / 2, GameConfig::GROUND_WIDTH, GameConfig::GROUND_HEIGHT, DARKGREEN));
+    newGroundObstacle(400.0f, 100.0f);
+    newGroundObstacle(-400.0f, 50.0f);
+    newGroundObstacle(820.0f, 200.0f);
+    newGroundObstacle(-820.0f, 200.0f);
+    newGroundObstacle(1275.0f, 150.0f);
+    newGroundObstacle(-1275.0f, 150.0f);
+    newGroundObstacle(-GameConfig::GROUND_WIDTH / 2.0f - (GROUND_OBSTACLE_WIDTH / 2.0f), 600.0f, SKYBLUE);
+    newGroundObstacle(GameConfig::GROUND_WIDTH / 2.0f + (GROUND_OBSTACLE_WIDTH / 2.0f), 600.0f, SKYBLUE);
+    const int entityWidth = 10;
+    const int entityHeight = 10;
+    for (size_t i = 0; i < GameConfig::DUMMY_ENTITY_COUNT; i++) {
+        entities.push_back(Entity(Random::getFloat(0, GameConfig::SOURCE_HEIGHT), Random::getFloat(0, GameConfig::SOURCE_WIDTH), 10, 10, YELLOW));
+    }
 }
