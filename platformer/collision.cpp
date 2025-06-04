@@ -18,7 +18,7 @@ void collision(Entity& entity) {
         float minOverlapY = std::fmin(overlapY_bottomPush, overlapY_topPush);
         const float penetration_threshold = 0.01f;
         if (minOverlapX < minOverlapY && minOverlapX > penetration_threshold) {
-            entity.velocity.x = 0;
+            entity.velocity.x = 0.0f;
             float displacementX;
             if (overlapX_rightPush < overlapX_leftPush) {
                 displacementX = -overlapX_rightPush;
@@ -29,7 +29,7 @@ void collision(Entity& entity) {
             entity.position.x += displacementX;
         }
         else if (minOverlapY <= minOverlapX && minOverlapY > penetration_threshold) {
-            entity.velocity.y = 0;
+            entity.velocity.y = 0.0f;
             float displacementY;
             if (overlapY_bottomPush < overlapY_topPush) {
                 displacementY = -overlapY_bottomPush;
@@ -44,5 +44,5 @@ void collision(Entity& entity) {
     entity.updateAABB();
 }
 Box getBox(Vector2 position, float width, float height) {
-    return { { position.x - width / 2, position.y - height / 2 }, { position.x + width / 2, position.y + height / 2 } };
+    return { { position.x - width / 2.0f, position.y - height / 2.0f }, { position.x + width / 2.0f, position.y + height / 2.0f } };
 };
