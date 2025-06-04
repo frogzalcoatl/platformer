@@ -139,6 +139,7 @@
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="keyCommands.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="quadTree.cpp" />
     <ClCompile Include="random.cpp" />
   </ItemGroup>
   <ItemGroup>

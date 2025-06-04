@@ -3,7 +3,9 @@
 #include "raylib.h"
 #include "raygui.h"
 #include <vector>
-struct Box {
+#include <memory>
+
+struct AABB {
     Vector2 min;
     Vector2 max;
 };
@@ -13,7 +15,7 @@ public:
     Vector2 velocity;
     float width;
     float height;
-    Box aabb;
+    AABB aabb;
     Color color;
     bool isStatic;
     bool isGrounded;
@@ -25,10 +27,26 @@ public:
     void tick();
     void draw() const;
 };
+class QuadTree {
+public:
+    static const int NODE_CAPACITY = 4;
+    AABB boundary;
+    std::vector<Entity*> entityPtrs;
+    std::unique_ptr<QuadTree> northWest;
+    std::unique_ptr<QuadTree> northEast;
+    std::unique_ptr<QuadTree> southWest;
+    std::unique_ptr<QuadTree> southEast;
+    QuadTree(AABB _boundary);
+    bool insert(Entity* entityPtr);
+    void subdivide();
+    std::vector<Entity*> queryRange(AABB range);
+    void quadTreeCollision();
+    void draw() const;
+};
 namespace GameConfig {
     constexpr int SOURCE_WIDTH = 1280;
     constexpr int SOURCE_HEIGHT = 720;
-    constexpr float SOURCE_ASPECT_RATIO = SOURCE_WIDTH / SOURCE_HEIGHT;
+    constexpr float SOURCE_ASPECT_RATIO = (float)SOURCE_WIDTH / SOURCE_HEIGHT;
     constexpr int MIN_WINDOW_WIDTH = 800;
     constexpr int MIN_WINDOW_HEIGHT = 600;
     constexpr float MAX_VELOCITY_X = 600.0f;
@@ -42,30 +60,32 @@ namespace GameConfig {
     constexpr float GROUND_HEIGHT = 100.0f;
     constexpr float DEAD_ZONE_PERCENT_X = 0.2f;
     constexpr float DEAD_ZONE_PERCENT_Y = 0.3f;
+    constexpr float MAX_CAMERA_ZOOM = 1.50f;
+    constexpr float MIN_CAMERA_ZOOM = 0.01f;
     constexpr int DUMMY_ENTITY_COUNT = 0;
     inline bool showDebugInfo = true;
     inline bool cameraShouldFollow = true;
     inline bool prevCameraFollowState = true;
-    inline Vector2 cameraFocus = { 0.0f, 0.0f };
 }
 namespace SessionData {
+    inline QuadTree quadTree = QuadTree({ { -GameConfig::GROUND_WIDTH / 2.0f, 0.0f }, { GameConfig::GROUND_WIDTH / 2.0f, 10.0f } });
+    inline float deltaTime = 0.0f;
+    inline int command = 0;
     inline int currentMonitor = 0;
     inline int monitorRefreshRate = 60;
-    inline int monitorAspectRatio = 0;
+    inline float monitorAspectRatio = 0.0f;
     inline int windowWidth = GameConfig::MIN_WINDOW_WIDTH;
     inline int windowHeight = GameConfig::MIN_WINDOW_HEIGHT;
     inline float windowAspectRatio = (float)(windowWidth / windowHeight);
-    inline Rectangle source = { 0.0f, 0.0f, GameConfig::SOURCE_WIDTH, GameConfig::SOURCE_HEIGHT };
-    inline Rectangle display = { 0.0f, 0.0f, (float)windowWidth, (float)windowHeight };
-    inline int command = 0;
+    inline int preFullscreenWindowWidth = windowWidth;
+    inline int preFullscreenWindowHeight = windowHeight;
+    inline Rectangle effectiveSource;
     inline RenderTexture2D target;
     inline Camera2D gameCamera = { 0 };
-    inline Rectangle effectiveRenderTextureSource;
     inline float minCameraFocusX = 0.0f;
     inline float maxCameraFocusX = 0.0f;
     inline float minCameraFocusY = 0.0f;
     inline float maxCameraFocusY = 0.0f;
-    inline float deltaTime = 0.0f;
 }
 namespace Random {
     float getFloat(float min, float max);
@@ -74,15 +94,17 @@ namespace Random {
 inline std::vector<Entity> platforms{};
 inline std::vector<Entity> entities{};
 inline Entity player{ 0, 0, 20, 20, DARKPURPLE, false };
-void collision(Entity& entity);
-Box getBox(Vector2 position, float width, float height);
+void collision(Entity& entity, std::vector<Entity>& collidingEntities);
+AABB getBox(Vector2 position, float width, float height);
+bool areAABBsColliding(AABB box1, AABB box2);
+Rectangle AABBtoRectangle(AABB aabb);
 void newGroundObstacle(float x, float height, Color color = LIGHTGRAY);
 void spawnTestEntities();
-void monitorAndWindowChecks();
+void monitorAndWindowChecks(bool overRideWindowResizedCheck = false);
 void keyCommands();
 void cameraFocus();
-void updateEffectiveRenderTextureSource();
 void displayDebugInfo();
 void drawScaledScreen();
 void windowSetup();
+void PlatformerFullscreenToggle();
 #endif

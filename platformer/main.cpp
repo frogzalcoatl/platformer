@@ -1,7 +1,7 @@
 #include "sahars_platformer.h"
 #define RAYGUI_IMPLEMENTATION
-#include <algorithm>
 #include <cmath>
+#include <iostream>
 
 int main() {
     windowSetup();
@@ -9,12 +9,13 @@ int main() {
     player.moveTo(0.0f, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT - player.height / 2.0f);
     while (!WindowShouldClose()) {
         SessionData::deltaTime = GetFrameTime();
+        SessionData::deltaTime = std::fmin(SessionData::deltaTime, 0.03f);
         keyCommands();
+        //SessionData::quadTree.queryRange(SessionData::quadTree.boundary);
         for (size_t i = 0; i < platforms.size(); i++) platforms[i].tick();
         for (size_t i = 0; i < entities.size(); i++) entities[i].tick();
         player.tick();
         monitorAndWindowChecks();
-        updateEffectiveRenderTextureSource();
         cameraFocus();
         BeginTextureMode(SessionData::target);
         ClearBackground(SKYBLUE);
@@ -22,6 +23,7 @@ int main() {
         for (size_t i = 0; i < platforms.size(); i++) platforms[i].draw();
         for (size_t i = 0; i < entities.size(); i++) entities[i].draw();
         player.draw();
+        //SessionData::quadTree.draw();
         EndMode2D();
         EndTextureMode();
         BeginDrawing();

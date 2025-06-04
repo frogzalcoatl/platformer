@@ -2,14 +2,14 @@
 #include <cmath>
 #include <algorithm>
 
-Entity::Entity(float xPosition, float yPosition, float entityWidth, float entityHeight, Color entityColor, bool isEntityStatic) {
+Entity::Entity(float xPosition, float yPosition, float _width, float _height, Color _color, bool _isStatic) {
     position = { xPosition, yPosition };
     velocity = { 0.0f, 0.0f };
-    width = entityWidth;
-    height = entityHeight;
+    width = _width;
+    height = _height;
     aabb = getBox(position, width, height);
-    color = entityColor;
-    isStatic = isEntityStatic;
+    color = _color;
+    isStatic = _isStatic;
     isGrounded = false;
 };
 void Entity::updateAABB() {
@@ -51,17 +51,18 @@ void Entity::tick() {
     position.x += velocity.x * SessionData::deltaTime;
     position.y += velocity.y * SessionData::deltaTime;
     updateAABB();
-    collision(*this);
+    collision(*this, platforms);
 }
 void Entity::draw() const {
     DrawRectangleV(aabb.min, { width, height }, color);
-    //DrawRectangleLinesEx({ aabb.min.x, aabb.min.y, aabb.max.x - aabb.min.x, aabb.max.y - aabb.min.y }, 1.0f, RED);
+    //DrawRectangleLinesEx(AABBtoRectangle(aabb), 1.0f, RED);
 }
 static const float GROUND_OBSTACLE_WIDTH = 50.0f;
 void newGroundObstacle(float x, float height, Color color) {
     platforms.push_back(Entity(x, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT - height / 2.0f, GROUND_OBSTACLE_WIDTH, height, color));
 }
 void spawnTestEntities() {
+    SessionData::quadTree.insert(&player);
     platforms.push_back(Entity(0.0f, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT / 2.0f, GameConfig::GROUND_WIDTH, GameConfig::GROUND_HEIGHT, DARKGREEN));
     newGroundObstacle(400.0f, 100.0f);
     newGroundObstacle(-400.0f, 100.0f);
@@ -71,9 +72,15 @@ void spawnTestEntities() {
     newGroundObstacle(-1275.0f, 150.0f);
     newGroundObstacle(-GameConfig::GROUND_WIDTH / 2.0f - (GROUND_OBSTACLE_WIDTH / 2.0f), 600.0f, SKYBLUE);
     newGroundObstacle(GameConfig::GROUND_WIDTH / 2.0f + (GROUND_OBSTACLE_WIDTH / 2.0f), 600.0f, SKYBLUE);
+    for (size_t i = 0; i < platforms.size(); i++) {
+        SessionData::quadTree.insert(&platforms[i]);
+    }
     const float entityWidth = 10.0f;
     const float entityHeight = 10.0f;
     for (size_t i = 0; i < GameConfig::DUMMY_ENTITY_COUNT; i++) {
         entities.push_back(Entity(Random::getFloat(0, GameConfig::SOURCE_WIDTH), Random::getFloat(0, GameConfig::SOURCE_HEIGHT), 10.0f, 10.0f, YELLOW));
+    }
+    for (size_t i = 0; i < entities.size(); i++) {
+        SessionData::quadTree.insert(&entities[i]);
     }
 }

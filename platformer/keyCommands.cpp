@@ -1,4 +1,5 @@
 #include "sahars_platformer.h"
+#include <algorithm>
 
 void keyCommands() {
     SessionData::command = 0;
@@ -8,8 +9,7 @@ void keyCommands() {
     if (IsKeyDown(KEY_D)) SessionData::command |= 8;
     if (IsKeyDown(KEY_R)) SessionData::command |= 16;
     if (IsKeyDown(KEY_V)) SessionData::command |= 32;
-    if (IsKeyPressed(KEY_LEFT_SHIFT)) GameConfig::cameraShouldFollow = !GameConfig::cameraShouldFollow;
-    if (IsKeyPressed(KEY_F3)) GameConfig::showDebugInfo = !GameConfig::showDebugInfo;
+    if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) SessionData::command |= 64;
     if (SessionData::command & 1 && player.isGrounded) {
         player.velocity.y = -GameConfig::JUMP_VELOCITY;
         player.isGrounded = false;
@@ -23,10 +23,21 @@ void keyCommands() {
     }
     if (SessionData::command & 16) {
         player.moveTo(0, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT - player.height / 2.0f);
-        GameConfig::cameraFocus = player.position;
+        SessionData::gameCamera.target = player.position;
     }
     if (SessionData::command & 32) {
         player.velocity = { 0, 0 };
         player.applyGravity({ player.position.x, GameConfig::SOURCE_HEIGHT }, -GameConfig::GRAVITY_PULL_FACTOR);
+    }
+    if (SessionData::command & 64 && IsKeyPressed(KEY_ZERO)) SessionData::gameCamera.zoom = 1.0f;
+    if (IsKeyPressed(KEY_LEFT_SHIFT)) GameConfig::cameraShouldFollow = !GameConfig::cameraShouldFollow;
+    if (IsKeyPressed(KEY_F3)) GameConfig::showDebugInfo = !GameConfig::showDebugInfo;
+    if (IsKeyPressed(KEY_F11)) {
+        PlatformerFullscreenToggle();
+    }
+    Vector2 mouseWheelMove = GetMouseWheelMoveV();
+    if (mouseWheelMove.y != 0.0f) {
+        SessionData::gameCamera.zoom += mouseWheelMove.y / 25.0f;
+        SessionData::gameCamera.zoom = std::clamp(SessionData::gameCamera.zoom, GameConfig::MIN_CAMERA_ZOOM, GameConfig::MAX_CAMERA_ZOOM);
     }
 }

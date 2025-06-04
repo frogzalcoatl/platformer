@@ -1,5 +1,5 @@
 # Sahar's Platformer
-This project uses Visual Studio 2022 and vcpkg for C++ package management via a vcpkg.json manifest file. If you want to open and test what I have so far, follow the instructions below.
+This project uses Visual Studio 2022 and vcpkg for C++ package management via a vcpkg.json manifest file. If you want to test what I've completed so far using Visual Studio 2022, follow the instructions below.
 
 ## Prerequisites
 1. **Git:** install from https://git-scm.com/downloads
