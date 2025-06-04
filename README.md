@@ -11,7 +11,7 @@ This project uses Visual Studio 2022 and vcpkg for C++ package management via a 
 ## Setup
 1. **Clone the repository**
 ```bash
-git clone https://github.com/saharholmes/platformer
+git clone https://github.com/frogzalcoatl/platformer
 cd platformer
 ```
 2. **Open in Visual Studio 2022**
