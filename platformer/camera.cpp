@@ -7,7 +7,6 @@ void windowSetup() {
     InitWindow(GameConfig::MIN_WINDOW_WIDTH, GameConfig::MIN_WINDOW_HEIGHT, "Platformer");
     SetWindowMinSize(GameConfig::MIN_WINDOW_WIDTH, GameConfig::MIN_WINDOW_HEIGHT);
     MaximizeWindow();
-    SetTextureWrap(SessionData::target.texture, TEXTURE_WRAP_CLAMP);
     monitorAndWindowChecks(true);
     SessionData::camera.rotation = 0.0f;
     SessionData::camera.zoom = 1.0f;
@@ -28,7 +27,6 @@ void monitorAndWindowChecks(bool overRideWindowResizedCheck) {
         SessionData::pixelsPerBlock = SessionData::windowWidth / 80;
         SessionData::camera.target = { player.position.x * SessionData::pixelsPerBlock, player.position.y * SessionData::pixelsPerBlock };
         SessionData::camera.offset = { SessionData::windowWidth / 2.0f, SessionData::windowHeight / 2.0f };
-        SessionData::target = LoadRenderTexture(SessionData::windowWidth, SessionData::windowHeight);
     }
 }
 void cameraFocus() {
@@ -37,8 +35,8 @@ void cameraFocus() {
     float visibleWorldHeight = SessionData::windowHeight / SessionData::camera.zoom;
     SessionData::minCameraFocusX = -GameConfig::GROUND_WIDTH * SessionData::pixelsPerBlock / 2.0f + (visibleWorldWidth / 2.0f);
     SessionData::maxCameraFocusX = GameConfig::GROUND_WIDTH * SessionData::pixelsPerBlock / 2.0f - (visibleWorldWidth / 2.0f);
-    SessionData::minCameraFocusY = (float)SessionData::windowHeight / 2.0f - GameConfig::GROUND_HEIGHT;
-    SessionData::maxCameraFocusY = 1000000.0f;
+    SessionData::minCameraFocusY = (float)SessionData::windowHeight / 2.0f - GameConfig::GROUND_HEIGHT * SessionData::pixelsPerBlock / 2.0f;
+    SessionData::maxCameraFocusY = (float)SessionData::windowHeight / 2.0f - GameConfig::GROUND_HEIGHT * SessionData::pixelsPerBlock / 2.0f;
     float playerRelativeX = player.position.x * SessionData::pixelsPerBlock - SessionData::camera.target.x;
     float playerRelativeY = player.position.y * SessionData::pixelsPerBlock - SessionData::camera.target.y;
     float deadZoneWorldLimitX = (visibleWorldWidth * (GameConfig::DEAD_ZONE_PERCENT_X)) / 2.0f;
@@ -64,18 +62,15 @@ void cameraFocus() {
         SessionData::camera.target.y = 0.0f;
     }
 }
-void drawScaledScreen() {
-    Rectangle destination = { 0.0f, 0.0f, (float)SessionData::windowWidth, (float)SessionData::windowHeight };
-    DrawTexturePro(SessionData::target.texture, destination, destination, { 0, 0 }, 0.0f, WHITE);
-}
 void displayDebugInfo() {
     DrawFPS(10, 10);
     DrawText(TextFormat("Win:%.0fx%.0f (AR: %.2f)", SessionData::windowWidth, SessionData::windowHeight, SessionData::windowAspectRatio), 10, 30, 20, LIME);
-    DrawText(TextFormat("Player Pos: %.3f, %.3f", player.position.x, player.position.y), 10, 55, 20, BLACK);
-    DrawText(TextFormat("Command: %d", SessionData::command), 10, 80, 20, BLACK);
-    DrawText(TextFormat("Camera Zoom: %.2fx", SessionData::camera.zoom), 10, 105, 20, BLACK);
-    DrawText(GameConfig::cameraShouldFollow ? "Camera: FOLLOW" : "Camera: STATIC", 10, 130, 20, BLACK);
-    DrawText(player.isGrounded ? "isGrounded: true" : "isGrounded: false", 10, 155, 20, BLACK);
+    DrawText(TextFormat("Player Pos: %.2f, %.2f", player.position.x, player.position.y), 10, 55, 20, BLACK);
+    DrawText(TextFormat("Camera Pos: %.2f, %.2f", SessionData::camera.target.x, SessionData::camera.target.y), 10, 80, 20, BLACK);
+    DrawText(TextFormat("Command: %d", SessionData::command), 10, 105, 20, BLACK);
+    DrawText(TextFormat("Camera Zoom: %.2fx", SessionData::camera.zoom), 10, 130, 20, BLACK);
+    DrawText(GameConfig::cameraShouldFollow ? "Camera: FOLLOW" : "Camera: STATIC", 10, 155, 20, BLACK);
+    DrawText(player.isGrounded ? "isGrounded: true" : "isGrounded: false", 10, 180, 20, BLACK);
 }
 void PlatformerFullscreenToggle() {
     if (IsWindowFullscreen()) {
@@ -86,4 +81,18 @@ void PlatformerFullscreenToggle() {
         SetWindowSize(GetMonitorWidth(SessionData::currentMonitor), GetMonitorHeight(SessionData::currentMonitor));
     }
     ToggleFullscreen();
+}
+void platformerDrawAABB(const AABB* aabb, Color color) {
+    DrawRectangleV({ aabb->min.x * SessionData::pixelsPerBlock, -aabb->max.y * SessionData::pixelsPerBlock + SessionData::windowHeight }, { (aabb->max.x - aabb->min.x) * SessionData::pixelsPerBlock, (aabb->max.y - aabb->min.y) * SessionData::pixelsPerBlock }, color);
+}
+void platformerDrawAABBLines(const AABB* aabb, float lineThick, Color color) {
+    DrawRectangleLinesEx({ aabb->min.x * SessionData::pixelsPerBlock, -aabb->max.y * SessionData::pixelsPerBlock + SessionData::windowHeight, (aabb->max.x - aabb->min.x) * SessionData::pixelsPerBlock, (aabb->max.y - aabb->min.y) * SessionData::pixelsPerBlock }, lineThick * SessionData::pixelsPerBlock, color);
+}
+void platformerDrawText(const char* text, int posX, int posY, int fontSize, Color color, const Vector2* textDimensionPtr) {
+    if (!textDimensionPtr) {
+        Vector2 textDimensions = MeasureTextEx(GetFontDefault(), text, (float)fontSize, TEXT_SPACING);
+        DrawText(text, posX * SessionData::pixelsPerBlock, -(posY + (int)textDimensions.y) * SessionData::pixelsPerBlock + SessionData::windowHeight, fontSize * SessionData::pixelsPerBlock, color);
+        return;
+    }
+    DrawText(text, posX * SessionData::pixelsPerBlock, -(posY + (int)textDimensionPtr->y) * SessionData::pixelsPerBlock + SessionData::windowHeight, fontSize * SessionData::pixelsPerBlock, color);
 }

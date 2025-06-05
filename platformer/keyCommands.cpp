@@ -10,9 +10,15 @@ void keyCommands() {
     if (IsKeyDown(KEY_R)) SessionData::command |= 16;
     if (IsKeyDown(KEY_V)) SessionData::command |= 32;
     if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) SessionData::command |= 64;
-    if (SessionData::command & 1 && player.isGrounded) {
-        player.velocity.y = GameConfig::JUMP_VELOCITY;
-        player.isGrounded = false;
+    if (SessionData::command & 1) {
+        if (GameConfig::ENABLE_GRAVITY) {
+            if (player.isGrounded) {
+                player.velocity.y = GameConfig::JUMP_VELOCITY;
+                player.isGrounded = false;
+            }
+        } else {
+            player.velocity.y += GameConfig::PLAYER_ACCELERATION * SessionData::deltaTime;
+        }
     }
     if (SessionData::command & 2) player.velocity.y -= GameConfig::PLAYER_ACCELERATION * SessionData::deltaTime;
     if (SessionData::command & 4) player.velocity.x -= GameConfig::PLAYER_ACCELERATION * SessionData::deltaTime;
@@ -27,7 +33,7 @@ void keyCommands() {
     }
     if (SessionData::command & 32) {
         player.velocity = { 0, 0 };
-        player.applyGravity({ player.position.x, 1000.0f }, GameConfig::GRAVITY_PULL_FACTOR);
+        if (GameConfig::ENABLE_GRAVITY) player.applyGravity({ player.position.x, 1000.0f }, GameConfig::GRAVITY_PULL_FACTOR);
     }
     if (SessionData::command & 64 && IsKeyPressed(KEY_ZERO)) SessionData::camera.zoom = 1.0f;
     if (IsKeyPressed(KEY_LEFT_SHIFT)) GameConfig::cameraShouldFollow = !GameConfig::cameraShouldFollow;

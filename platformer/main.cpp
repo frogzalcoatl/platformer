@@ -15,27 +15,26 @@ int main() {
         SessionData::deltaTime = GetFrameTime();
         SessionData::deltaTime = std::fmin(SessionData::deltaTime, 0.03f);
         keyCommands();
-        for (size_t i = 0; i < entities.size(); i++) entities[i].tick();
+        for (size_t i = 0; i < entities.size(); i++) {
+            entities[i].tick();
+            std::vector<Entity*> potentialEntityColliders = SessionData::quadTree.queryRange(entities[i].aabb);
+            collision(&entities[i], potentialEntityColliders);
+        }
         player.tick();
         std::vector<Entity*> potentialPlayerColliders = SessionData::quadTree.queryRange(player.aabb);
         collision(&player, potentialPlayerColliders);
         monitorAndWindowChecks();
         cameraFocus();
-        BeginTextureMode(SessionData::target);
+        BeginDrawing();
         ClearBackground(SKYBLUE);
         BeginMode2D(SessionData::camera);
         for (size_t i = 0; i < entities.size(); i++) entities[i].draw();
         player.draw();
         SessionData::quadTree.draw();
         EndMode2D();
-        EndTextureMode();
-        BeginDrawing();
-        ClearBackground(BLACK);
-        drawScaledScreen();
         if (GameConfig::showDebugInfo) displayDebugInfo();
         EndDrawing();
     }
-    UnloadRenderTexture(SessionData::target);
     CloseWindow();
     return 0;
 }

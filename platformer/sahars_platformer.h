@@ -4,6 +4,7 @@
 #include "raygui.h"
 #include <vector>
 #include <memory>
+#include <optional>
 
 struct AABB {
     Vector2 min;
@@ -29,7 +30,7 @@ public:
 };
 class QuadTree {
 public:
-    static constexpr int NODE_CAPACITY = 4;
+    static constexpr int NODE_CAPACITY = 8;
     AABB boundary;
     std::vector<Entity*> entityPtrs;
     std::unique_ptr<QuadTree> northWest;
@@ -61,7 +62,9 @@ namespace GameConfig {
     constexpr float DEAD_ZONE_PERCENT_Y = 0.3f;
     constexpr float MAX_CAMERA_ZOOM = 1.50f;
     constexpr float MIN_CAMERA_ZOOM = 0.01f;
-    constexpr int DUMMY_ENTITY_COUNT = 0;
+    constexpr int DUMMY_ENTITY_COUNT = 100;
+    constexpr bool ARE_DUMMY_ENTITIES_STATIC = false;
+    constexpr bool ENABLE_GRAVITY = true;
     inline bool showDebugInfo = true;
     inline bool cameraShouldFollow = true;
     inline bool prevCameraFollowState = true;
@@ -78,7 +81,7 @@ namespace SessionData {
     inline float windowAspectRatio = (float)(windowWidth / windowHeight);
     inline int preFullscreenWindowWidth = windowWidth;
     inline int preFullscreenWindowHeight = windowHeight;
-    inline RenderTexture2D target;
+    inline RenderTexture2D screen;
     inline Camera2D camera = { 0 };
     inline float minCameraFocusX = 0.0f;
     inline float maxCameraFocusX = 0.0f;
@@ -102,7 +105,9 @@ void monitorAndWindowChecks(bool overRideWindowResizedCheck = false);
 void keyCommands();
 void cameraFocus();
 void displayDebugInfo();
-void drawScaledScreen();
 void windowSetup();
 void PlatformerFullscreenToggle();
+void platformerDrawAABB(const AABB* aabb, Color color);
+void platformerDrawAABBLines(const AABB* aabb, float lineThick, Color color);
+void platformerDrawText(const char* text, int posX, int posY, int fontSize, Color color, const Vector2* textDimensionPtr = nullptr);
 #endif
