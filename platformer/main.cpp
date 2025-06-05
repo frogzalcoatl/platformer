@@ -6,21 +6,24 @@
 int main() {
     windowSetup();
     spawnTestEntities();
-    player.moveTo(GameConfig::PLAYER_SPAWN_POINT.x, GameConfig::PLAYER_SPAWN_POINT.y);
     while (!WindowShouldClose()) {
+        SessionData::quadTree.clear();
+        SessionData::quadTree.insert(&player);
+        for (size_t i = 0; i < entities.size(); i++) {
+            SessionData::quadTree.insert(&entities[i]);
+        }
         SessionData::deltaTime = GetFrameTime();
         SessionData::deltaTime = std::fmin(SessionData::deltaTime, 0.03f);
         keyCommands();
-        //SessionData::quadTree.queryRange(SessionData::quadTree.boundary);
-        for (size_t i = 0; i < platforms.size(); i++) platforms[i].tick();
         for (size_t i = 0; i < entities.size(); i++) entities[i].tick();
         player.tick();
+        std::vector<Entity*> potentialPlayerColliders = SessionData::quadTree.queryRange(player.aabb);
+        collision(&player, potentialPlayerColliders);
         monitorAndWindowChecks();
         cameraFocus();
         BeginTextureMode(SessionData::target);
         ClearBackground(SKYBLUE);
         BeginMode2D(SessionData::camera);
-        for (size_t i = 0; i < platforms.size(); i++) platforms[i].draw();
         for (size_t i = 0; i < entities.size(); i++) entities[i].draw();
         player.draw();
         SessionData::quadTree.draw();

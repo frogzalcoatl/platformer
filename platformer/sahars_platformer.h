@@ -29,7 +29,7 @@ public:
 };
 class QuadTree {
 public:
-    static const int NODE_CAPACITY = 4;
+    static constexpr int NODE_CAPACITY = 4;
     AABB boundary;
     std::vector<Entity*> entityPtrs;
     std::unique_ptr<QuadTree> northWest;
@@ -37,6 +37,7 @@ public:
     std::unique_ptr<QuadTree> southWest;
     std::unique_ptr<QuadTree> southEast;
     QuadTree(AABB _boundary);
+    void clear();
     bool insert(Entity* entityPtr);
     void subdivide();
     std::vector<Entity*> queryRange(AABB range);
@@ -44,7 +45,6 @@ public:
     void draw() const;
 };
 namespace GameConfig {
-    constexpr float SOURCE_ASPECT_RATIO = 16.0f / 9.0f;
     constexpr int MIN_WINDOW_WIDTH = 800;
     constexpr int MIN_WINDOW_HEIGHT = 600;
     constexpr float MAX_VELOCITY_X = 35.0f;
@@ -56,7 +56,7 @@ namespace GameConfig {
     constexpr float GROUND_FRICTION = 6.0f;
     constexpr float GROUND_WIDTH = 200.0f;
     constexpr float GROUND_HEIGHT = 3.0f;
-    constexpr Vector2 PLAYER_SPAWN_POINT = { 0.0, GROUND_HEIGHT };
+    constexpr Vector2 PLAYER_SPAWN_POINT = { 0.0, GROUND_HEIGHT + 0.5f };
     constexpr float DEAD_ZONE_PERCENT_X = 0.2f;
     constexpr float DEAD_ZONE_PERCENT_Y = 0.3f;
     constexpr float MAX_CAMERA_ZOOM = 1.50f;
@@ -80,7 +80,6 @@ namespace SessionData {
     inline int preFullscreenWindowHeight = windowHeight;
     inline RenderTexture2D target;
     inline Camera2D camera = { 0 };
-    inline Vector2 cameraVelocity = { 0, 0 };
     inline float minCameraFocusX = 0.0f;
     inline float maxCameraFocusX = 0.0f;
     inline float minCameraFocusY = 0.0f;
@@ -91,10 +90,9 @@ namespace Random {
     float getFloat(float min, float max);
     int getInt(int min, int max);
 }
-inline std::vector<Entity> platforms{};
 inline std::vector<Entity> entities{};
 inline Entity player{ 0, 0, 1, 1, DARKPURPLE, false };
-void collision(Entity& entity, std::vector<Entity>& collidingEntities);
+void collision(Entity* entity, std::vector<Entity*> collidingEntities);
 AABB getBox(Vector2 position, float width, float height);
 bool areAABBsColliding(AABB box1, AABB box2);
 Rectangle AABBtoRectangle(AABB aabb, int multiplier = 1);

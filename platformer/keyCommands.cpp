@@ -22,7 +22,7 @@ void keyCommands() {
         if (dampingDivisor > 0.0001) player.velocity.x /= dampingDivisor;
     }
     if (SessionData::command & 16) {
-        player.moveTo(0.0f, 1.0f);
+        player.moveTo(GameConfig::PLAYER_SPAWN_POINT.x, GameConfig::PLAYER_SPAWN_POINT.y);
         SessionData::camera.target = player.position;
     }
     if (SessionData::command & 32) {

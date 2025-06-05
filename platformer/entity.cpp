@@ -51,7 +51,6 @@ void Entity::tick() {
     position.x += velocity.x * SessionData::deltaTime;
     position.y += velocity.y * SessionData::deltaTime;
     updateAABB();
-    collision(*this, platforms);
 }
 void Entity::draw() const {
     DrawRectangleV({ aabb.min.x * SessionData::pixelsPerBlock, aabb.min.y * SessionData::pixelsPerBlock }, { width * SessionData::pixelsPerBlock, height * SessionData::pixelsPerBlock }, color);
@@ -59,11 +58,11 @@ void Entity::draw() const {
 }
 static const float GROUND_OBSTACLE_WIDTH = 4.0f;
 void newGroundObstacle(float x, float height, Color color) {
-    platforms.push_back(Entity(x, height / 2.0f + GameConfig::GROUND_HEIGHT, GROUND_OBSTACLE_WIDTH, height, color));
+    entities.push_back(Entity(x, height / 2.0f + GameConfig::GROUND_HEIGHT, GROUND_OBSTACLE_WIDTH, height, color));
 }
 void spawnTestEntities() {
-    SessionData::quadTree.insert(&player);
-    platforms.push_back(Entity(0.0f, 0.0, GameConfig::GROUND_WIDTH, GameConfig::GROUND_HEIGHT * 2, DARKGREEN));
+    player.moveTo(GameConfig::PLAYER_SPAWN_POINT.x, GameConfig::PLAYER_SPAWN_POINT.y);
+    entities.push_back(Entity(0.0f, 0.0, GameConfig::GROUND_WIDTH, GameConfig::GROUND_HEIGHT * 2, DARKGREEN));
     newGroundObstacle(25.0f, 6.0f);
     newGroundObstacle(-25.0f, 6.0f);
     newGroundObstacle(50.0f, 12.0f);
@@ -72,15 +71,9 @@ void spawnTestEntities() {
     newGroundObstacle(-80.0f, 9.0f);
     newGroundObstacle(-GameConfig::GROUND_WIDTH / 2.0f - (GROUND_OBSTACLE_WIDTH / 2.0f), 600.0f, SKYBLUE);
     newGroundObstacle(GameConfig::GROUND_WIDTH / 2.0f + (GROUND_OBSTACLE_WIDTH / 2.0f), 600.0f, SKYBLUE);
-    for (size_t i = 0; i < platforms.size(); i++) {
-        SessionData::quadTree.insert(&platforms[i]);
-    }
     const float entityWidth = 10.0f;
     const float entityHeight = 10.0f;
     for (size_t i = 0; i < GameConfig::DUMMY_ENTITY_COUNT; i++) {
-        entities.push_back(Entity(Random::getFloat(-GameConfig::GROUND_WIDTH / 2.0f, GameConfig::GROUND_WIDTH / 2.0f), Random::getFloat(0, 50), 10.0f, 10.0f, YELLOW));
-    }
-    for (size_t i = 0; i < entities.size(); i++) {
-        SessionData::quadTree.insert(&entities[i]);
+        entities.push_back(Entity(Random::getFloat(-GameConfig::GROUND_WIDTH / 2.0f, GameConfig::GROUND_WIDTH / 2.0f), Random::getFloat(0, 50), 1.0f, 1.0f, YELLOW, false));
     }
 }

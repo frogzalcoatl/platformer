@@ -1,15 +1,16 @@
 #include "sahars_platformer.h"
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 
 void windowSetup() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(GameConfig::MIN_WINDOW_WIDTH, GameConfig::MIN_WINDOW_HEIGHT, "Platformer");
     SetWindowMinSize(GameConfig::MIN_WINDOW_WIDTH, GameConfig::MIN_WINDOW_HEIGHT);
     MaximizeWindow();
-    monitorAndWindowChecks(true);
     SetTextureWrap(SessionData::target.texture, TEXTURE_WRAP_CLAMP);
+    monitorAndWindowChecks(true);
+    SessionData::camera.rotation = 0.0f;
+    SessionData::camera.zoom = 1.0f;
 }
 void monitorAndWindowChecks(bool overRideWindowResizedCheck) {
     if (GetCurrentMonitor() != SessionData::currentMonitor) {
@@ -27,8 +28,6 @@ void monitorAndWindowChecks(bool overRideWindowResizedCheck) {
         SessionData::pixelsPerBlock = SessionData::windowWidth / 80;
         SessionData::camera.target = { player.position.x * SessionData::pixelsPerBlock, player.position.y * SessionData::pixelsPerBlock };
         SessionData::camera.offset = { SessionData::windowWidth / 2.0f, SessionData::windowHeight / 2.0f };
-        SessionData::camera.rotation = 0.0f;
-        SessionData::camera.zoom = 1.0f;
         SessionData::target = LoadRenderTexture(SessionData::windowWidth, SessionData::windowHeight);
     }
 }
@@ -67,7 +66,7 @@ void cameraFocus() {
 }
 void drawScaledScreen() {
     Rectangle destination = { 0.0f, 0.0f, (float)SessionData::windowWidth, (float)SessionData::windowHeight };
-    DrawTexturePro(SessionData::target.texture, destination, destination, { 0,0 }, 0.0f, WHITE);
+    DrawTexturePro(SessionData::target.texture, destination, destination, { 0, 0 }, 0.0f, WHITE);
 }
 void displayDebugInfo() {
     DrawFPS(10, 10);
@@ -76,6 +75,7 @@ void displayDebugInfo() {
     DrawText(TextFormat("Command: %d", SessionData::command), 10, 80, 20, BLACK);
     DrawText(TextFormat("Camera Zoom: %.2fx", SessionData::camera.zoom), 10, 105, 20, BLACK);
     DrawText(GameConfig::cameraShouldFollow ? "Camera: FOLLOW" : "Camera: STATIC", 10, 130, 20, BLACK);
+    DrawText(player.isGrounded ? "isGrounded: true" : "isGrounded: false", 10, 155, 20, BLACK);
 }
 void PlatformerFullscreenToggle() {
     if (IsWindowFullscreen()) {
