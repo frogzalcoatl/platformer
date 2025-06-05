@@ -38,7 +38,7 @@ void Entity::applyGravity(Vector2 gravityCenter, float pullFactor) {
 }
 void Entity::tick() {
     if (isStatic) return;
-    applyGravity({ position.x, GameConfig::SOURCE_HEIGHT }, GameConfig::GRAVITY_PULL_FACTOR);
+    applyGravity({ position.x, -GameConfig::GROUND_HEIGHT }, GameConfig::GRAVITY_PULL_FACTOR);
     if (GameConfig::AIR_FRICTION > 0.0f && SessionData::deltaTime > 0.0f) {
         float dampingDivisor = 1.0f + GameConfig::AIR_FRICTION * SessionData::deltaTime;
         if (dampingDivisor > 0.0001f) {
@@ -54,22 +54,22 @@ void Entity::tick() {
     collision(*this, platforms);
 }
 void Entity::draw() const {
-    DrawRectangleV(aabb.min, { width, height }, color);
+    DrawRectangleV({ aabb.min.x * SessionData::pixelsPerBlock, aabb.min.y * SessionData::pixelsPerBlock }, { width * SessionData::pixelsPerBlock, height * SessionData::pixelsPerBlock }, color);
     //DrawRectangleLinesEx(AABBtoRectangle(aabb), 1.0f, RED);
 }
-static const float GROUND_OBSTACLE_WIDTH = 50.0f;
+static const float GROUND_OBSTACLE_WIDTH = 4.0f;
 void newGroundObstacle(float x, float height, Color color) {
-    platforms.push_back(Entity(x, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT - height / 2.0f, GROUND_OBSTACLE_WIDTH, height, color));
+    platforms.push_back(Entity(x, height / 2.0f + GameConfig::GROUND_HEIGHT, GROUND_OBSTACLE_WIDTH, height, color));
 }
 void spawnTestEntities() {
     SessionData::quadTree.insert(&player);
-    platforms.push_back(Entity(0.0f, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT / 2.0f, GameConfig::GROUND_WIDTH, GameConfig::GROUND_HEIGHT, DARKGREEN));
-    newGroundObstacle(400.0f, 100.0f);
-    newGroundObstacle(-400.0f, 100.0f);
-    newGroundObstacle(820.0f, 200.0f);
-    newGroundObstacle(-820.0f, 200.0f);
-    newGroundObstacle(1275.0f, 150.0f);
-    newGroundObstacle(-1275.0f, 150.0f);
+    platforms.push_back(Entity(0.0f, 0.0, GameConfig::GROUND_WIDTH, GameConfig::GROUND_HEIGHT * 2, DARKGREEN));
+    newGroundObstacle(25.0f, 6.0f);
+    newGroundObstacle(-25.0f, 6.0f);
+    newGroundObstacle(50.0f, 12.0f);
+    newGroundObstacle(-50.0f, 12.0f);
+    newGroundObstacle(80.0f, 9.0f);
+    newGroundObstacle(-80.0f, 9.0f);
     newGroundObstacle(-GameConfig::GROUND_WIDTH / 2.0f - (GROUND_OBSTACLE_WIDTH / 2.0f), 600.0f, SKYBLUE);
     newGroundObstacle(GameConfig::GROUND_WIDTH / 2.0f + (GROUND_OBSTACLE_WIDTH / 2.0f), 600.0f, SKYBLUE);
     for (size_t i = 0; i < platforms.size(); i++) {
@@ -78,7 +78,7 @@ void spawnTestEntities() {
     const float entityWidth = 10.0f;
     const float entityHeight = 10.0f;
     for (size_t i = 0; i < GameConfig::DUMMY_ENTITY_COUNT; i++) {
-        entities.push_back(Entity(Random::getFloat(0, GameConfig::SOURCE_WIDTH), Random::getFloat(0, GameConfig::SOURCE_HEIGHT), 10.0f, 10.0f, YELLOW));
+        entities.push_back(Entity(Random::getFloat(-GameConfig::GROUND_WIDTH / 2.0f, GameConfig::GROUND_WIDTH / 2.0f), Random::getFloat(0, 50), 10.0f, 10.0f, YELLOW));
     }
     for (size_t i = 0; i < entities.size(); i++) {
         SessionData::quadTree.insert(&entities[i]);

@@ -1,6 +1,7 @@
 #include "sahars_platformer.h"
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 void windowSetup() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -8,11 +9,6 @@ void windowSetup() {
     SetWindowMinSize(GameConfig::MIN_WINDOW_WIDTH, GameConfig::MIN_WINDOW_HEIGHT);
     MaximizeWindow();
     monitorAndWindowChecks(true);
-    SessionData::gameCamera.target = player.position;
-    SessionData::gameCamera.offset = { GameConfig::SOURCE_WIDTH / 2.0f, GameConfig::SOURCE_HEIGHT / 2.0f };
-    SessionData::gameCamera.rotation = 0.0f;
-    SessionData::gameCamera.zoom = 1.0f;
-    SessionData::target = LoadRenderTexture(GameConfig::SOURCE_WIDTH, GameConfig::SOURCE_HEIGHT);
     SetTextureWrap(SessionData::target.texture, TEXTURE_WRAP_CLAMP);
 }
 void monitorAndWindowChecks(bool overRideWindowResizedCheck) {
@@ -28,72 +24,58 @@ void monitorAndWindowChecks(bool overRideWindowResizedCheck) {
         SessionData::windowWidth = GetScreenWidth();
         SessionData::windowHeight = GetScreenHeight();
         SessionData::windowAspectRatio = (float)SessionData::windowWidth / (float)SessionData::windowHeight;
+        SessionData::pixelsPerBlock = SessionData::windowWidth / 80;
+        SessionData::camera.target = { player.position.x * SessionData::pixelsPerBlock, player.position.y * SessionData::pixelsPerBlock };
+        SessionData::camera.offset = { SessionData::windowWidth / 2.0f, SessionData::windowHeight / 2.0f };
+        SessionData::camera.rotation = 0.0f;
+        SessionData::camera.zoom = 1.0f;
+        SessionData::target = LoadRenderTexture(SessionData::windowWidth, SessionData::windowHeight);
     }
 }
 void cameraFocus() {
-    SessionData::effectiveSource = { 0.0f, 0.0f, (float)GameConfig::SOURCE_WIDTH, (float)GameConfig::SOURCE_HEIGHT };
-    if (SessionData::windowAspectRatio > GameConfig::SOURCE_ASPECT_RATIO) {
-        SessionData::effectiveSource.height = std::roundf((float)GameConfig::SOURCE_WIDTH / SessionData::windowAspectRatio);
-        SessionData::effectiveSource.y = std::roundf(((float)GameConfig::SOURCE_HEIGHT - SessionData::effectiveSource.height) / 2.0f);
-    } else if (SessionData::windowAspectRatio < GameConfig::SOURCE_ASPECT_RATIO) {
-        SessionData::effectiveSource.width = std::roundf((float)GameConfig::SOURCE_HEIGHT * SessionData::windowAspectRatio);
-        SessionData::effectiveSource.x = std::roundf(((float)GameConfig::SOURCE_WIDTH - SessionData::effectiveSource.width) / 2.0f);
-    }
-    if (GameConfig::cameraShouldFollow && !GameConfig::prevCameraFollowState) {
-        SessionData::gameCamera.target = player.position;
-    }
-    GameConfig::prevCameraFollowState = GameConfig::cameraShouldFollow;
     if (!GameConfig::cameraShouldFollow) return;
-    float visibleWorldWidth = SessionData::effectiveSource.width / SessionData::gameCamera.zoom;
-    float visibleWorldHeight = SessionData::effectiveSource.height / SessionData::gameCamera.zoom;
-    SessionData::minCameraFocusX = -GameConfig::GROUND_WIDTH / 2.0f + (visibleWorldWidth / 2.0f);
-    SessionData::maxCameraFocusX = GameConfig::GROUND_WIDTH / 2.0f - (visibleWorldWidth / 2.0f);
-    SessionData::minCameraFocusY = (float)GameConfig::SOURCE_HEIGHT / 2.0f;
-    SessionData::maxCameraFocusY = (float)GameConfig::SOURCE_HEIGHT / 2.0f;
-    float playerRelativeX = player.position.x - SessionData::gameCamera.target.x;
-    float playerRelativeY = player.position.y - SessionData::gameCamera.target.y;
+    float visibleWorldWidth = SessionData::windowWidth / SessionData::camera.zoom;
+    float visibleWorldHeight = SessionData::windowHeight / SessionData::camera.zoom;
+    SessionData::minCameraFocusX = -GameConfig::GROUND_WIDTH * SessionData::pixelsPerBlock / 2.0f + (visibleWorldWidth / 2.0f);
+    SessionData::maxCameraFocusX = GameConfig::GROUND_WIDTH * SessionData::pixelsPerBlock / 2.0f - (visibleWorldWidth / 2.0f);
+    SessionData::minCameraFocusY = (float)SessionData::windowHeight / 2.0f - GameConfig::GROUND_HEIGHT;
+    SessionData::maxCameraFocusY = 1000000.0f;
+    float playerRelativeX = player.position.x * SessionData::pixelsPerBlock - SessionData::camera.target.x;
+    float playerRelativeY = player.position.y * SessionData::pixelsPerBlock - SessionData::camera.target.y;
     float deadZoneWorldLimitX = (visibleWorldWidth * (GameConfig::DEAD_ZONE_PERCENT_X)) / 2.0f;
     float deadZoneWorldLimitY = (visibleWorldHeight * (GameConfig::DEAD_ZONE_PERCENT_Y)) / 2.0f;
     if (playerRelativeX > deadZoneWorldLimitX) {
-        SessionData::gameCamera.target.x += playerRelativeX - deadZoneWorldLimitX;
+        SessionData::camera.target.x += playerRelativeX - deadZoneWorldLimitX;
     } else if (playerRelativeX < -deadZoneWorldLimitX) {
-        SessionData::gameCamera.target.x += playerRelativeX + deadZoneWorldLimitX;
+        SessionData::camera.target.x += playerRelativeX + deadZoneWorldLimitX;
     }
     if (playerRelativeY > deadZoneWorldLimitY) {
-        SessionData::gameCamera.target.y += playerRelativeY - deadZoneWorldLimitY;
+        SessionData::camera.target.y += playerRelativeY - deadZoneWorldLimitY;
     } else if (playerRelativeY < -deadZoneWorldLimitY) {
-        SessionData::gameCamera.target.y += playerRelativeY + deadZoneWorldLimitY;
+        SessionData::camera.target.y += playerRelativeY + deadZoneWorldLimitY;
     }
     if (SessionData::minCameraFocusX <= SessionData::maxCameraFocusX) {
-        SessionData::gameCamera.target.x = std::clamp(SessionData::gameCamera.target.x, SessionData::minCameraFocusX, SessionData::maxCameraFocusX);
+        SessionData::camera.target.x = std::clamp(SessionData::camera.target.x, SessionData::minCameraFocusX, SessionData::maxCameraFocusX);
     } else {
-        SessionData::gameCamera.target.x = 0.0f;
+        SessionData::camera.target.x = 0.0f;
     }
     if (SessionData::minCameraFocusY <= SessionData::maxCameraFocusY) {
-        SessionData::gameCamera.target.y = std::clamp(SessionData::gameCamera.target.y, SessionData::minCameraFocusY, SessionData::maxCameraFocusY);
+        SessionData::camera.target.y = std::clamp(SessionData::camera.target.y, SessionData::minCameraFocusY, SessionData::maxCameraFocusY);
     } else {
-        SessionData::gameCamera.target.y = 0.0f;
+        SessionData::camera.target.y = 0.0f;
     }
 }
 void drawScaledScreen() {
     Rectangle destination = { 0.0f, 0.0f, (float)SessionData::windowWidth, (float)SessionData::windowHeight };
-    Rectangle source = { SessionData::effectiveSource.x, SessionData::effectiveSource.y, SessionData::effectiveSource.width, -SessionData::effectiveSource.height };
-    DrawTexturePro(SessionData::target.texture, source, destination, { 0,0 }, 0.0f, WHITE);
+    DrawTexturePro(SessionData::target.texture, destination, destination, { 0,0 }, 0.0f, WHITE);
 }
 void displayDebugInfo() {
     DrawFPS(10, 10);
     DrawText(TextFormat("Win:%.0fx%.0f (AR: %.2f)", SessionData::windowWidth, SessionData::windowHeight, SessionData::windowAspectRatio), 10, 30, 20, LIME);
-    DrawText(TextFormat("Effective Src: pos (%.0f,%.0f) %.0fx%.0f",
-        SessionData::effectiveSource.x,
-        SessionData::effectiveSource.y,
-        SessionData::effectiveSource.width,
-        SessionData::effectiveSource.height),
-        10, 55, 20, LIME
-    );
-    DrawText(TextFormat("Player Pos: %.1f, %.1f", player.position.x, player.position.y), 10, 80, 20, BLACK);
-    DrawText(TextFormat("Command: %d", SessionData::command), 10, 105, 20, BLACK);
-    DrawText(TextFormat("Camera Zoom: %.2fx", SessionData::gameCamera.zoom), 10, 130, 20, BLACK);
-    DrawText(GameConfig::cameraShouldFollow ? "Camera: FOLLOW" : "Camera: STATIC", 10, 155, 20, BLACK);
+    DrawText(TextFormat("Player Pos: %.3f, %.3f", player.position.x, player.position.y), 10, 55, 20, BLACK);
+    DrawText(TextFormat("Command: %d", SessionData::command), 10, 80, 20, BLACK);
+    DrawText(TextFormat("Camera Zoom: %.2fx", SessionData::camera.zoom), 10, 105, 20, BLACK);
+    DrawText(GameConfig::cameraShouldFollow ? "Camera: FOLLOW" : "Camera: STATIC", 10, 130, 20, BLACK);
 }
 void PlatformerFullscreenToggle() {
     if (IsWindowFullscreen()) {

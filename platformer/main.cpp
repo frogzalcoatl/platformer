@@ -6,7 +6,7 @@
 int main() {
     windowSetup();
     spawnTestEntities();
-    player.moveTo(0.0f, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT - player.height / 2.0f);
+    player.moveTo(GameConfig::PLAYER_SPAWN_POINT.x, GameConfig::PLAYER_SPAWN_POINT.y);
     while (!WindowShouldClose()) {
         SessionData::deltaTime = GetFrameTime();
         SessionData::deltaTime = std::fmin(SessionData::deltaTime, 0.03f);
@@ -19,11 +19,11 @@ int main() {
         cameraFocus();
         BeginTextureMode(SessionData::target);
         ClearBackground(SKYBLUE);
-        BeginMode2D(SessionData::gameCamera);
+        BeginMode2D(SessionData::camera);
         for (size_t i = 0; i < platforms.size(); i++) platforms[i].draw();
         for (size_t i = 0; i < entities.size(); i++) entities[i].draw();
         player.draw();
-        //SessionData::quadTree.draw();
+        SessionData::quadTree.draw();
         EndMode2D();
         EndTextureMode();
         BeginDrawing();

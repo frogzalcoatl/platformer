@@ -11,10 +11,10 @@ void keyCommands() {
     if (IsKeyDown(KEY_V)) SessionData::command |= 32;
     if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) SessionData::command |= 64;
     if (SessionData::command & 1 && player.isGrounded) {
-        player.velocity.y = -GameConfig::JUMP_VELOCITY;
+        player.velocity.y = GameConfig::JUMP_VELOCITY;
         player.isGrounded = false;
     }
-    if (SessionData::command & 2) player.velocity.y += GameConfig::PLAYER_ACCELERATION * SessionData::deltaTime;
+    if (SessionData::command & 2) player.velocity.y -= GameConfig::PLAYER_ACCELERATION * SessionData::deltaTime;
     if (SessionData::command & 4) player.velocity.x -= GameConfig::PLAYER_ACCELERATION * SessionData::deltaTime;
     if (SessionData::command & 8) player.velocity.x += GameConfig::PLAYER_ACCELERATION * SessionData::deltaTime;
     if (!(SessionData::command & 8) && !(SessionData::command & 4) && player.isGrounded) {
@@ -22,14 +22,14 @@ void keyCommands() {
         if (dampingDivisor > 0.0001) player.velocity.x /= dampingDivisor;
     }
     if (SessionData::command & 16) {
-        player.moveTo(0, GameConfig::SOURCE_HEIGHT - GameConfig::GROUND_HEIGHT - player.height / 2.0f);
-        SessionData::gameCamera.target = player.position;
+        player.moveTo(0.0f, 1.0f);
+        SessionData::camera.target = player.position;
     }
     if (SessionData::command & 32) {
         player.velocity = { 0, 0 };
-        player.applyGravity({ player.position.x, GameConfig::SOURCE_HEIGHT }, -GameConfig::GRAVITY_PULL_FACTOR);
+        player.applyGravity({ player.position.x, 1000.0f }, GameConfig::GRAVITY_PULL_FACTOR);
     }
-    if (SessionData::command & 64 && IsKeyPressed(KEY_ZERO)) SessionData::gameCamera.zoom = 1.0f;
+    if (SessionData::command & 64 && IsKeyPressed(KEY_ZERO)) SessionData::camera.zoom = 1.0f;
     if (IsKeyPressed(KEY_LEFT_SHIFT)) GameConfig::cameraShouldFollow = !GameConfig::cameraShouldFollow;
     if (IsKeyPressed(KEY_F3)) GameConfig::showDebugInfo = !GameConfig::showDebugInfo;
     if (IsKeyPressed(KEY_F11)) {
@@ -37,7 +37,7 @@ void keyCommands() {
     }
     Vector2 mouseWheelMove = GetMouseWheelMoveV();
     if (mouseWheelMove.y != 0.0f) {
-        SessionData::gameCamera.zoom += mouseWheelMove.y / 25.0f;
-        SessionData::gameCamera.zoom = std::clamp(SessionData::gameCamera.zoom, GameConfig::MIN_CAMERA_ZOOM, GameConfig::MAX_CAMERA_ZOOM);
+        SessionData::camera.zoom += mouseWheelMove.y / 25.0f;
+        SessionData::camera.zoom = std::clamp(SessionData::camera.zoom, GameConfig::MIN_CAMERA_ZOOM, GameConfig::MAX_CAMERA_ZOOM);
     }
 }

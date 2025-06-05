@@ -53,7 +53,7 @@ void QuadTree::quadTreeCollision() {
 	}
 }
 void QuadTree::draw() const {
-	DrawRectangleLinesEx(AABBtoRectangle(boundary), 10.0f, BLUE);
+	DrawRectangleLinesEx(AABBtoRectangle(boundary, SessionData::pixelsPerBlock), 5.0f, BLUE);
 	if (northWest == nullptr) return;
 	northWest->draw();
 	northEast->draw();

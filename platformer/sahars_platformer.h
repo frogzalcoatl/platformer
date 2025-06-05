@@ -44,20 +44,19 @@ public:
     void draw() const;
 };
 namespace GameConfig {
-    constexpr int SOURCE_WIDTH = 1280;
-    constexpr int SOURCE_HEIGHT = 720;
-    constexpr float SOURCE_ASPECT_RATIO = (float)SOURCE_WIDTH / SOURCE_HEIGHT;
+    constexpr float SOURCE_ASPECT_RATIO = 16.0f / 9.0f;
     constexpr int MIN_WINDOW_WIDTH = 800;
     constexpr int MIN_WINDOW_HEIGHT = 600;
-    constexpr float MAX_VELOCITY_X = 600.0f;
-    constexpr float MAX_VELOCITY_Y = 1500.0f;
-    constexpr float PLAYER_ACCELERATION = 1500.0f;
-    constexpr float GRAVITY_PULL_FACTOR = 2500.0f;
-    constexpr float JUMP_VELOCITY = 1000.0f;
+    constexpr float MAX_VELOCITY_X = 35.0f;
+    constexpr float MAX_VELOCITY_Y = 90.0f;
+    constexpr float PLAYER_ACCELERATION = 90.0f;
+    constexpr float GRAVITY_PULL_FACTOR = 150.0f;
+    constexpr float JUMP_VELOCITY = 65.0f;
     constexpr float AIR_FRICTION = 0.105f;
     constexpr float GROUND_FRICTION = 6.0f;
-    constexpr float GROUND_WIDTH = SOURCE_WIDTH * 4.0f;
-    constexpr float GROUND_HEIGHT = 100.0f;
+    constexpr float GROUND_WIDTH = 200.0f;
+    constexpr float GROUND_HEIGHT = 3.0f;
+    constexpr Vector2 PLAYER_SPAWN_POINT = { 0.0, GROUND_HEIGHT };
     constexpr float DEAD_ZONE_PERCENT_X = 0.2f;
     constexpr float DEAD_ZONE_PERCENT_Y = 0.3f;
     constexpr float MAX_CAMERA_ZOOM = 1.50f;
@@ -68,7 +67,7 @@ namespace GameConfig {
     inline bool prevCameraFollowState = true;
 }
 namespace SessionData {
-    inline QuadTree quadTree = QuadTree({ { -GameConfig::GROUND_WIDTH / 2.0f, 0.0f }, { GameConfig::GROUND_WIDTH / 2.0f, 10.0f } });
+    inline QuadTree quadTree = QuadTree({ { -GameConfig::GROUND_WIDTH / 2.0f, 0.0f }, { GameConfig::GROUND_WIDTH / 2.0f, 100.0f } });
     inline float deltaTime = 0.0f;
     inline int command = 0;
     inline int currentMonitor = 0;
@@ -79,13 +78,14 @@ namespace SessionData {
     inline float windowAspectRatio = (float)(windowWidth / windowHeight);
     inline int preFullscreenWindowWidth = windowWidth;
     inline int preFullscreenWindowHeight = windowHeight;
-    inline Rectangle effectiveSource;
     inline RenderTexture2D target;
-    inline Camera2D gameCamera = { 0 };
+    inline Camera2D camera = { 0 };
+    inline Vector2 cameraVelocity = { 0, 0 };
     inline float minCameraFocusX = 0.0f;
     inline float maxCameraFocusX = 0.0f;
     inline float minCameraFocusY = 0.0f;
     inline float maxCameraFocusY = 0.0f;
+    inline int pixelsPerBlock = 0;
 }
 namespace Random {
     float getFloat(float min, float max);
@@ -93,11 +93,11 @@ namespace Random {
 }
 inline std::vector<Entity> platforms{};
 inline std::vector<Entity> entities{};
-inline Entity player{ 0, 0, 20, 20, DARKPURPLE, false };
+inline Entity player{ 0, 0, 1, 1, DARKPURPLE, false };
 void collision(Entity& entity, std::vector<Entity>& collidingEntities);
 AABB getBox(Vector2 position, float width, float height);
 bool areAABBsColliding(AABB box1, AABB box2);
-Rectangle AABBtoRectangle(AABB aabb);
+Rectangle AABBtoRectangle(AABB aabb, int multiplier = 1);
 void newGroundObstacle(float x, float height, Color color = LIGHTGRAY);
 void spawnTestEntities();
 void monitorAndWindowChecks(bool overRideWindowResizedCheck = false);

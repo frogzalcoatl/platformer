@@ -1,5 +1,6 @@
 #include "sahars_platformer.h"
 #include <cmath>
+#include <iostream>
 
 void collision(Entity& entity, std::vector<Entity>& collidingEntities) {
     if (entity.isStatic) return;
@@ -8,8 +9,8 @@ void collision(Entity& entity, std::vector<Entity>& collidingEntities) {
         if (!areAABBsColliding(entity.aabb, collidingEntities[i].aabb)) continue;
         float overlapX_rightPush = entity.aabb.max.x - collidingEntities[i].aabb.min.x;
         float overlapX_leftPush = collidingEntities[i].aabb.max.x - entity.aabb.min.x;
-        float overlapY_bottomPush = entity.aabb.max.y - collidingEntities[i].aabb.min.y;
-        float overlapY_topPush = collidingEntities[i].aabb.max.y - entity.aabb.min.y;
+        float overlapY_topPush = entity.aabb.max.y - collidingEntities[i].aabb.min.y;
+        float overlapY_bottomPush = collidingEntities[i].aabb.max.y - entity.aabb.min.y;
         float minOverlapX = std::fmin(overlapX_rightPush, overlapX_leftPush);
         float minOverlapY = std::fmin(overlapY_bottomPush, overlapY_topPush);
         const float penetration_threshold = 0.01f;
@@ -23,16 +24,14 @@ void collision(Entity& entity, std::vector<Entity>& collidingEntities) {
                 displacementX = overlapX_leftPush;
             }
             entity.position.x += displacementX;
-        }
-        else if (minOverlapY <= minOverlapX && minOverlapY > penetration_threshold) {
+        } else if (minOverlapY <= minOverlapX && minOverlapY > penetration_threshold) {
             entity.velocity.y = 0.0f;
             float displacementY;
-            if (overlapY_bottomPush < overlapY_topPush) {
-                displacementY = -overlapY_bottomPush;
+            if (overlapY_topPush < overlapY_bottomPush) {
+                displacementY = -overlapY_topPush;
+            } else {
+                displacementY = overlapY_bottomPush;
                 entity.isGrounded = true;
-            }
-            else {
-                displacementY = overlapY_topPush;
             }
             entity.position.y += displacementY;
         }
@@ -50,6 +49,6 @@ bool areAABBsColliding(AABB box1, AABB box2) {
         box1.min.y < box2.max.y
         );
 }
-Rectangle AABBtoRectangle(AABB aabb) {
-    return { aabb.min.x, aabb.max.x, aabb.max.x - aabb.min.x, aabb.max.y - aabb.min.y };
+Rectangle AABBtoRectangle(AABB aabb, int multiplier) {
+    return { aabb.min.x * multiplier, aabb.min.y * multiplier, aabb.max.x * multiplier - aabb.min.x * multiplier, aabb.max.y * multiplier - aabb.min.y * multiplier };
 }
