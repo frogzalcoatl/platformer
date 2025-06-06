@@ -14,7 +14,7 @@ int main() {
         }
         SessionData::deltaTime = GetFrameTime();
         SessionData::deltaTime = std::fmin(SessionData::deltaTime, 0.03f);
-        keyCommands();
+        keyCommands(SessionData::command);
         for (size_t i = 0; i < entities.size(); i++) {
             entities[i].tick();
             std::vector<Entity*> potentialEntityColliders = SessionData::quadTree.queryRange(entities[i].aabb);
@@ -24,7 +24,7 @@ int main() {
         std::vector<Entity*> potentialPlayerColliders = SessionData::quadTree.queryRange(player.aabb);
         collision(&player, potentialPlayerColliders);
         monitorAndWindowChecks();
-        cameraFocus();
+        cameraFocus(SessionData::camera);
         BeginDrawing();
         ClearBackground(SKYBLUE);
         BeginMode2D(SessionData::camera);

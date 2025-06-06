@@ -54,7 +54,7 @@ void QuadTree::subdivide() {
 	southWest = std::make_unique<QuadTree>(AABB{ { boundary.min.x, boundary.min.y + yLengthHalf }, { boundary.max.x - xLengthHalf, boundary.max.y } });
 	southEast = std::make_unique<QuadTree>(AABB{ { boundary.min.x + xLengthHalf, boundary.min.y + yLengthHalf }, { boundary.max.x, boundary.max.y } });
 }
-std::vector<Entity*> QuadTree::queryRange(AABB range) {
+std::vector<Entity*> QuadTree::queryRange(AABB &range) {
 	std::vector<Entity*> entitiesInRange;
 	if (!areAABBsColliding(boundary, range)) return entitiesInRange;
 	for (size_t i = 0; i < entityPtrs.size(); i++) {
@@ -82,10 +82,10 @@ void QuadTree::quadTreeCollision() {
 void QuadTree::draw() const {
 	platformerDrawAABBLines(&boundary, 0.125f, { 0, 121, 241, 128 });
 	if (northWest == nullptr) {
-		const char* text = TextFormat("Max Capacity: %.0f\nminPos: %.0f, %.0f\nmaxPos: %.0f, %.0f", (float)QuadTree::NODE_CAPACITY, boundary.min.x, boundary.min.y, boundary.max.x, boundary.max.y);
-		int fontSize = (int)(boundary.max.x - boundary.min.x) / 10.0f;
+		const char* text = TextFormat("Max Capacity: %i\nCurrent Capacity: %i\nminPos: %i, %.0f\nmaxPos: %i, %i", QuadTree::NODE_CAPACITY, entityPtrs.size(), boundary.min.x, boundary.min.y, boundary.max.x, boundary.max.y);
+		int fontSize = std::max((int)(boundary.max.x - boundary.min.x) / 15, 1);
 		Vector2 textDimensions = MeasureTextEx(GetFontDefault(), text, (float)fontSize, TEXT_SPACING);
-		platformerDrawText(text, (int)boundary.min.x, (int)boundary.min.y - 1, fontSize, { 0, 121, 241, 128 }, &textDimensions);
+		platformerDrawText(text, (int)boundary.min.x + 5, (int)boundary.min.y, fontSize, { 0, 121, 241, 128 }, &textDimensions);
 		return;
 	}
 	northWest->draw();

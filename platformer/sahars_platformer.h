@@ -41,7 +41,7 @@ public:
     void clear();
     bool insert(Entity* entityPtr);
     void subdivide();
-    std::vector<Entity*> queryRange(AABB range);
+    std::vector<Entity*> queryRange(AABB &range);
     void quadTreeCollision();
     void draw() const;
 };
@@ -58,13 +58,13 @@ namespace GameConfig {
     constexpr float GROUND_WIDTH = 200.0f;
     constexpr float GROUND_HEIGHT = 3.0f;
     constexpr Vector2 PLAYER_SPAWN_POINT = { 0.0, GROUND_HEIGHT + 0.5f };
-    constexpr float DEAD_ZONE_PERCENT_X = 0.2f;
+    constexpr float DEAD_ZONE_PERCENT_X = 0.3f;
     constexpr float DEAD_ZONE_PERCENT_Y = 0.3f;
     constexpr float MAX_CAMERA_ZOOM = 1.50f;
     constexpr float MIN_CAMERA_ZOOM = 0.01f;
     constexpr int DUMMY_ENTITY_COUNT = 100;
     constexpr bool ARE_DUMMY_ENTITIES_STATIC = false;
-    constexpr bool ENABLE_GRAVITY = true;
+    inline bool ENABLE_GRAVITY = false;
     inline bool showDebugInfo = true;
     inline bool cameraShouldFollow = true;
     inline bool prevCameraFollowState = true;
@@ -81,13 +81,8 @@ namespace SessionData {
     inline float windowAspectRatio = (float)(windowWidth / windowHeight);
     inline int preFullscreenWindowWidth = windowWidth;
     inline int preFullscreenWindowHeight = windowHeight;
-    inline RenderTexture2D screen;
     inline Camera2D camera = { 0 };
-    inline float minCameraFocusX = 0.0f;
-    inline float maxCameraFocusX = 0.0f;
-    inline float minCameraFocusY = 0.0f;
-    inline float maxCameraFocusY = 0.0f;
-    inline int pixelsPerBlock = 0;
+    inline float pixelsPerBlock = 20.0f;
 }
 namespace Random {
     float getFloat(float min, float max);
@@ -101,13 +96,14 @@ bool areAABBsColliding(AABB box1, AABB box2);
 Rectangle AABBtoRectangle(AABB aabb, int multiplier = 1);
 void newGroundObstacle(float x, float height, Color color = LIGHTGRAY);
 void spawnTestEntities();
-void monitorAndWindowChecks(bool overRideWindowResizedCheck = false);
-void keyCommands();
-void cameraFocus();
+void monitorAndWindowChecks(const bool overRideWindowResizedCheck = false);
+void keyCommands(int command);
+void cameraFocus(Camera2D &camera);
+//void updateCameraSmooth(Camera2D* camera, Entity* entity);
 void displayDebugInfo();
 void windowSetup();
-void PlatformerFullscreenToggle();
-void platformerDrawAABB(const AABB* aabb, Color color);
-void platformerDrawAABBLines(const AABB* aabb, float lineThick, Color color);
-void platformerDrawText(const char* text, int posX, int posY, int fontSize, Color color, const Vector2* textDimensionPtr = nullptr);
+void platformerFullscreenToggle();
+void platformerDrawAABB(const AABB *aabb, Color color);
+void platformerDrawAABBLines(const AABB *aabb, float lineThick, Color color);
+void platformerDrawText(const char *text, int posX, int posY, int fontSize, Color color, const Vector2 *textDimensionPtr = nullptr);
 #endif
