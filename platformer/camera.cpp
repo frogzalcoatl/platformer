@@ -24,8 +24,7 @@ void monitorAndWindowChecks(bool overRideWindowResizedCheck) {
         SessionData::windowWidth = GetScreenWidth();
         SessionData::windowHeight = GetScreenHeight();
         SessionData::windowAspectRatio = (float)SessionData::windowWidth / (float)SessionData::windowHeight;
-        SessionData::pixelsPerBlock = SessionData::windowWidth / 80;
-        SessionData::camera.target = { player.position.x * SessionData::pixelsPerBlock, SessionData::windowHeight / 2.0f - GameConfig::GROUND_HEIGHT * SessionData::pixelsPerBlock / 2.0f };
+        SessionData::pixelsPerBlock = SessionData::windowWidth / 80.0f;
         SessionData::camera.offset = { SessionData::windowWidth / 2.0f, SessionData::windowHeight / 2.0f };
     }
 }

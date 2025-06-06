@@ -62,9 +62,9 @@ namespace GameConfig {
     constexpr float DEAD_ZONE_PERCENT_Y = 0.3f;
     constexpr float MAX_CAMERA_ZOOM = 1.50f;
     constexpr float MIN_CAMERA_ZOOM = 0.01f;
-    constexpr int DUMMY_ENTITY_COUNT = 100;
-    constexpr bool ARE_DUMMY_ENTITIES_STATIC = false;
-    inline bool ENABLE_GRAVITY = false;
+    constexpr int DUMMY_ENTITY_COUNT = 0;
+    constexpr bool ARE_DUMMY_ENTITIES_STATIC = true;
+    inline bool ENABLE_GRAVITY = true;
     inline bool showDebugInfo = true;
     inline bool cameraShouldFollow = true;
     inline bool prevCameraFollowState = true;

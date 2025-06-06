@@ -69,8 +69,8 @@ void spawnTestEntities() {
     newGroundObstacle(-50.0f, 12.0f);
     newGroundObstacle(80.0f, 9.0f);
     newGroundObstacle(-80.0f, 9.0f);
-    newGroundObstacle(-GameConfig::GROUND_WIDTH / 2.0f - (GROUND_OBSTACLE_WIDTH / 2.0f), 599.0f, SKYBLUE);
-    newGroundObstacle(GameConfig::GROUND_WIDTH / 2.0f + (GROUND_OBSTACLE_WIDTH / 2.0f), 599.0f, SKYBLUE);
+    newGroundObstacle(-GameConfig::GROUND_WIDTH / 2.0f - (GROUND_OBSTACLE_WIDTH / 2.0f) + 0.1, 600.0f, { 0, 0, 0, 0});
+    newGroundObstacle(GameConfig::GROUND_WIDTH / 2.0f + (GROUND_OBSTACLE_WIDTH / 2.0f) - 0.1, 600.0f, { 0, 0, 0, 0 });
     const float entityWidth = 10.0f;
     const float entityHeight = 10.0f;
     for (size_t i = 0; i < GameConfig::DUMMY_ENTITY_COUNT; i++) {
