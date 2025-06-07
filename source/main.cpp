@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-int main() {
+int WinMain() {
   windowSetup();
   spawnTestEntities();
   while (!SessionData::exitWindow) {
