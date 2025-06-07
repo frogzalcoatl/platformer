@@ -1,7 +1,11 @@
 # Sahar's Platformer
 ## Editing on VSCode
 1. **Prerequisites**
-    * **C++ Compiler:** Install the [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) and select **"Desktop development with C++"** during installation.
+    * **C++ Compiler:** Install [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). Instead of the "Workloads" tab, click on the "Individual components" tab at the top. Install the following four components:
+        * **MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest)**
+        * **Windows 11 SDK** (This is compatible with windows 10 and preferred over the Windows 10 SDK)
+        * **C++ CMake tools for Windows**
+        * **Just-In-Time debugger**
     * **VSCode:** Install the [latest version](https://code.visualstudio.com/download).
     * **VSCode Extensions:** Install the [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) and [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools).
     * **Powershell (Min version: v7.2.24):** Run `$PSVersionTable` in Powershell to check your current version. If necessary, install the latest stable release of [PowerShell](https://github.com/PowerShell/PowerShell/releases).
@@ -23,8 +27,6 @@
         * Open the command palette (`Ctrl+Shift+P`) and run `CMake: Select a Varient`.
         * Choose `Debug`.
         * Then build by pressing `F7`.
-        * Go to `main.cpp` and switch the `main()` function to `WinMain()`
-        * Select the `Release` varient and build it.
+        * Do the same for the `Release` varient.
 4. **Subsequent Launches**
     * You will be able to swap between Debug and Release through the status bar at the bottom of the VSCode window. Pressing `F5` automatically rebuilds the necessary files and runs the exe.
-    

@@ -1,7 +1,7 @@
 #ifndef sahars_platformer
 #define sahars_platformer
-#include "raygui.h"
 #include "raylib.h"
+#include "raygui.h"
 #include "raymath.h"
 #include <memory>
 #include <optional>

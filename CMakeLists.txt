@@ -7,6 +7,7 @@ find_package(raylib CONFIG REQUIRED)
 find_path(RAYGUI_INCLUDE_DIRS "raygui.h")
 find_path(PHYSAC_INCLUDE_DIRS "physac.h")
 add_executable(platformer
+    source/raylibImplementations.cpp
     source/main.cpp
     source/camera.cpp
     source/collision.cpp

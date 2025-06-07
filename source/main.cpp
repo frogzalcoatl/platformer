@@ -1,9 +1,13 @@
-#define RAYGUI_IMPLEMENTATION
 #include "sahars_platformer.h"
 #include <cmath>
 #include <iostream>
 
-int WinMain() {
+#if defined(_DEBUG)
+int main(void)
+#else
+int WinMain(void)
+#endif
+{
   windowSetup();
   spawnTestEntities();
   while (!SessionData::exitWindow) {
