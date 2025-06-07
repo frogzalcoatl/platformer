@@ -1,22 +1,25 @@
-# Build files
-*.exe
-*.obj
-*.ilk
-*.log
-*.pdb
-*.idb
-*.lastbuildstate
-*.tlog
+# OS-generated files
+.DS_Store
+Thumbs.db
 
-# User-specific Visual Studio files
+# Build artifacts and compiled files
+/build/
+
+# Ignore log files
+*.log
+
+# Ignore VS Code user-specific files
+.vscode/ipch/
+.vscode/.*.log
 *.vcxproj.user
 
-# Build directories
-x64/
-platformer/x64/
-
-# Visual Studio cache
-.vs/
-
-# vcpkg
-vcpkg_installed
+# Safeguard rules for compiled files, in case they are ever created outside the /build/ directory.
+*.exe
+*.dll
+*.lib
+*.pdb
+*.o
+*.obj
+*.ilk
+*.sln
+*.vcxproj*

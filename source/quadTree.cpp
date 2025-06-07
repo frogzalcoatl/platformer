@@ -1,5 +1,4 @@
 #include "sahars_platformer.h"
-#include <ranges>
 #include <iostream>
 
 QuadTree::QuadTree(AABB _boundary) {
@@ -79,17 +78,25 @@ void QuadTree::quadTreeCollision() {
 		collision(entityPtrs[i], entityPtrs);
 	}
 }
-void QuadTree::draw() const {
-	platformerDrawAABBLines(&boundary, 0.125f, { 0, 121, 241, 128 });
+void QuadTree::drawBounds() const {
+	drawAABBLines(&boundary, 0.125f, { 0, 121, 241, 128 });
+	if (northWest == nullptr) return;
+	northWest->drawBounds();
+	northEast->drawBounds();
+	southWest->drawBounds();
+	southEast->drawBounds();
+}
+void QuadTree::drawText() const {
 	if (northWest == nullptr) {
-		const char* text = TextFormat("Max Capacity: %i\nCurrent Capacity: %i\nminPos: %i, %.0f\nmaxPos: %i, %i", QuadTree::NODE_CAPACITY, entityPtrs.size(), boundary.min.x, boundary.min.y, boundary.max.x, boundary.max.y);
-		int fontSize = std::max((int)(boundary.max.x - boundary.min.x) / 15, 1);
-		Vector2 textDimensions = MeasureTextEx(GetFontDefault(), text, (float)fontSize, TEXT_SPACING);
-		platformerDrawText(text, (int)boundary.min.x + 5, (int)boundary.min.y, fontSize, { 0, 121, 241, 128 }, &textDimensions);
-		return;
+		const char* text = TextFormat("Cur: %i, Max: %i", (int)entityPtrs.size(), (int)QuadTree::NODE_CAPACITY);
+		float fontSize = boundary.max.x - boundary.min.x;
+		float centerX = boundary.min.x + (boundary.max.x - boundary.min.x) / 2.0f;
+		float centerY = boundary.min.y + (boundary.max.y - boundary.min.y) / 2.0f;
+		drawWorldText(text, centerX, centerY, fontSize, TEXT_SPACING, { 0, 121, 241, 255 });
+	} else {
+		northWest->drawText();
+		northEast->drawText();
+		southWest->drawText();
+		southEast->drawText();
 	}
-	northWest->draw();
-	northEast->draw();
-	southWest->draw();
-	southEast->draw();
 }

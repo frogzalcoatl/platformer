@@ -1,11 +1,12 @@
 {
   "dependencies": [
+    "raygui",
     {
       "name": "raylib",
       "features": [
         "use-audio"
       ]
     },
-    "raygui"
+    "physac"
   ]
 }
