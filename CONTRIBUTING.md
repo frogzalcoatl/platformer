@@ -30,11 +30,11 @@ cd C:\vcpkg
 ### **For Users with a Different Vcpkg Location:**
 * In VSCode, open `.vscode/settings.json` and edit `CMAKE_TOOLCHAIN_FILE` to match your vcpkg installation.
 * For example, if your path is `D:\dev\vcpkg`, the line should be `"D:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake"`
-4. **Inital VSCode Launch**
+## 4. **Inital VSCode Launch**
 * To prepare the project for both debugging and release, you must build each version once so the debugger can find the exe files.
     * Open the command palette (`Ctrl+Shift+P`) and run `CMake: Select a Varient`.
     * Choose `Debug`.
     * Then build by pressing `F7`.
     * Do the same for the `Release` varient.
-5. **Subsequent VSCode Launches**
+## 5. **Subsequent VSCode Launches**
 * You can swap between Debug and Release through a dropdown menu in the "Run and Debug" tab (`Ctrl+Shift+D`). Press `F7` to rebuild the exe then `F5` to run it.
