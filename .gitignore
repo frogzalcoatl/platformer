@@ -1,25 +1,72 @@
-# OS-generated files
-.DS_Store
-Thumbs.db
+# Prerequisites
+*.d
 
-# Build artifacts and compiled files
-/build/
-
-# Ignore log files
-*.log
-
-# Ignore VS Code user-specific files
-.vscode/ipch/
-.vscode/.*.log
-*.vcxproj.user
-
-# Safeguard rules for compiled files, in case they are ever created outside the /build/ directory.
-*.exe
-*.dll
-*.lib
-*.pdb
+# Object files
 *.o
+*.ko
 *.obj
+*.elf
+
+# Linker output
 *.ilk
-*.sln
-*.vcxproj*
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+# Visual Studio files
+[Dd]ebug/
+[Dd]ebug.DLL/
+[R]elease/
+[Rr]elease.DLL/
+*.user
+*.aps
+.vs
+
+# Clangd LSP
+.cache
+compile_commands.json
+
+# Build folder
+[Bb]uild
+
+# Android
+*apk*
+android.*

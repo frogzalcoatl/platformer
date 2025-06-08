@@ -1,2 +1,2 @@
 # Sahar's Platformer
-An in-development platformer written in C++ using the raylib game library. This project is helping me learn C++ for school. If you want to contribute, see [CONTRIBUTING.md](https://github.com/frogzalcoatl/platformer/blob/main/CONTRIBUTING.md). Ask me for an executable if you just wanna test what I have so far without the dev setup process. See what I have planned in [TODO.md](https://github.com/frogzalcoatl/platformer/blob/main/TODO.md).
+An in-development platformer written in C++ using the raylib game library. This project is helping me learn C++ for school. 
